@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-13T17:05:00Z",
+  "updated": "2026-05-13T17:18:36Z",
   "state": {
     "name": "Maine",
     "avg_regular": 4.515,
@@ -16,90 +16,90 @@
     {
       "name": "Androscoggin",
       "fips": "23001",
-      "avg_regular": 4.554
+      "avg_regular": 4.548
     },
     {
       "name": "Aroostook",
       "fips": "23003",
-      "avg_regular": 4.56
+      "avg_regular": 4.544
     },
     {
       "name": "Cumberland",
       "fips": "23005",
-      "avg_regular": 4.532
+      "avg_regular": 4.497
     },
     {
       "name": "Franklin",
       "fips": "23007",
-      "avg_regular": 4.536
+      "avg_regular": 4.521
     },
     {
       "name": "Hancock",
       "fips": "23009",
-      "avg_regular": 4.527
+      "avg_regular": 4.498
     },
     {
       "name": "Kennebec",
       "fips": "23011",
-      "avg_regular": 4.544
+      "avg_regular": 4.526
     },
     {
       "name": "Knox",
       "fips": "23013",
-      "avg_regular": 4.49
+      "avg_regular": 4.446
     },
     {
       "name": "Lincoln",
       "fips": "23015",
-      "avg_regular": 4.502
+      "avg_regular": 4.475
     },
     {
       "name": "Oxford",
       "fips": "23017",
-      "avg_regular": 4.546
+      "avg_regular": 4.526
     },
     {
       "name": "Penobscot",
       "fips": "23019",
-      "avg_regular": 4.558
+      "avg_regular": 4.527
     },
     {
       "name": "Piscataquis",
       "fips": "23021",
-      "avg_regular": 4.48
+      "avg_regular": 4.47
     },
     {
       "name": "Sagadahoc",
       "fips": "23023",
-      "avg_regular": 4.577
+      "avg_regular": 4.552
     },
     {
       "name": "Somerset",
       "fips": "23025",
-      "avg_regular": 4.509
+      "avg_regular": 4.44
     },
     {
       "name": "Waldo",
       "fips": "23027",
-      "avg_regular": 4.535
+      "avg_regular": 4.522
     },
     {
       "name": "Washington",
       "fips": "23029",
-      "avg_regular": 4.584
+      "avg_regular": 4.563
     },
     {
       "name": "York",
       "fips": "23031",
-      "avg_regular": 4.551
+      "avg_regular": 4.521
     }
   ],
   "cheapest": {
-    "name": "Piscataquis",
-    "avg_regular": 4.48
+    "name": "Somerset",
+    "avg_regular": 4.44
   },
   "most_expensive": {
     "name": "Washington",
-    "avg_regular": 4.584
+    "avg_regular": 4.563
   }
 }

@@ -22,8 +22,8 @@
   .card .delta { font-size: .85rem; color: var(--muted); }
   .card.center .price { color: var(--bdn-red); }
   .trend { font-size: .85rem; color: var(--muted); margin-top: .25rem; }
-  #map { width: 100%; height: 360px; }
-  #map svg { width: 100%; height: 100%; }
+  #map { width: 100%; height: 480px; }
+  #map svg { width: auto; height: 100%; max-width: 100%; display: block; margin: 0 auto; }
   .county { fill: #ddd; stroke: #fff; stroke-width: 1; cursor: pointer; }
   .county:hover { stroke: #000; stroke-width: 2; }
   .tooltip { position: absolute; background: #1a1a1a; color: #fff; padding: .35rem .55rem; border-radius: 4px; font-size: .85rem; pointer-events: none; opacity: 0; transition: opacity .1s; z-index: 10; }
@@ -71,12 +71,18 @@ async function load() {
 
 function fmt(p) { return "$" + p.toFixed(2); }
 
+// Format an absolute cent value as cents (e.g. "27¢") or dollars (e.g. "$1.53") when ≥ $1.
+function fmtChange(cents) {
+  const abs = Math.abs(cents);
+  return abs >= 100 ? `$${(abs / 100).toFixed(2)}` : `${abs}¢`;
+}
+
 function delta(a, b) {
   const c = Math.round((a - b) * 100);
   if (c === 0) return "Same as state avg";
   const arrow = c > 0 ? "↑" : "↓";
   const dir = c > 0 ? "above" : "below";
-  return `${arrow} ${Math.abs(c)}¢ ${dir} state avg`;
+  return `${arrow} ${fmtChange(c)} ${dir} state avg`;
 }
 
 function trendLine(state) {
@@ -85,7 +91,7 @@ function trendLine(state) {
   const fmtDir = (label, prev) => {
     const c = Math.round((base - prev) * 100);
     if (c === 0) return `Even with ${label}`;
-    return `${c > 0 ? "Up" : "Down"} ${Math.abs(c)}¢ from ${label}`;
+    return `${c > 0 ? "Up" : "Down"} ${fmtChange(c)} from ${label}`;
   };
   return [fmtDir("last week", t.week_ago), fmtDir("a year ago", t.year_ago)].join(" · ");
 }
@@ -107,7 +113,7 @@ function render(p, geo) {
   document.getElementById("state-vs-us").textContent =
     usDiff === 0
       ? `Same as US avg ${fmt(p.national.avg_regular)}`
-      : `${Math.abs(usDiff)}¢ ${usDiff > 0 ? "above" : "below"} US avg ${fmt(p.national.avg_regular)}`;
+      : `${fmtChange(usDiff)} ${usDiff > 0 ? "above" : "below"} US avg ${fmt(p.national.avg_regular)}`;
   document.getElementById("state-trend").textContent = trendLine(p.state);
 
   // Stale-data warning
@@ -151,14 +157,21 @@ function renderMap(p, geo) {
     if (x > maxX) maxX = x; if (y > maxY) maxY = y;
   }));
 
-  const W = 600, H = 360, pad = 10;
-  const sx = (W - 2 * pad) / (maxX - minX);
-  const sy = (H - 2 * pad) / (maxY - minY);
-  const s = Math.min(sx, sy);
-  // Center horizontally if aspect ratio leaves room
-  const offX = (W - (maxX - minX) * s) / 2;
-  const offY = (H - (maxY - minY) * s) / 2;
-  const project = ([x, y]) => [offX + (x - minX) * s, H - offY - (y - minY) * s];
+  // Equirectangular projection with latitude correction: at ~45°N, one degree of
+  // longitude is only ~cos(45°) ≈ 0.71 as wide as one degree of latitude. Without
+  // this, Maine renders too wide and looks squished.
+  const midLat = (minY + maxY) / 2;
+  const lonScale = Math.cos(midLat * Math.PI / 180);
+  const dx = (maxX - minX) * lonScale;
+  const dy = (maxY - minY);
+
+  // Size the SVG viewBox to Maine's true aspect so it fills the map area cleanly.
+  const VB_H = 500, pad = 10;
+  const VB_W = Math.round(VB_H * dx / dy);
+  const s = Math.min((VB_W - 2 * pad) / dx, (VB_H - 2 * pad) / dy);
+  const offX = (VB_W - dx * s) / 2;
+  const offY = (VB_H - dy * s) / 2;
+  const project = ([x, y]) => [offX + (x - minX) * lonScale * s, VB_H - offY - (y - minY) * s];
 
   const ringPath = ring => "M" + ring.map(project).map(pt => pt.join(",")).join("L") + "Z";
   const featurePath = f => {
@@ -168,7 +181,7 @@ function renderMap(p, geo) {
     return "";
   };
 
-  const svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Map of Maine showing average regular gas prices by county">
+  const svg = `<svg viewBox="0 0 ${VB_W} ${VB_H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Map of Maine showing average regular gas prices by county">
     ${geo.features.map(f => {
       const fips = f.properties.fips;
       const name = f.properties.name;
