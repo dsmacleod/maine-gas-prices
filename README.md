@@ -21,7 +21,7 @@ python3 -m http.server 8000         # then open http://localhost:8000/index.html
 ## Embed
 
 ```html
-<iframe src="https://<gh-pages-url>/embed.html"
-        width="100%" height="640" frameborder="0"
+<iframe src="https://dsmacleod.github.io/maine-gas-prices/embed.html"
+        width="100%" height="700" frameborder="0"
         style="border:0;"></iframe>
 ```
