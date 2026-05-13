@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<!--
+  Maine Gas Prices Widget
+  Embed via iframe. Daily-updated from AAA Maine.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maine Gas Prices</title>
+<style>
+  :root { --bdn-red: #d6232a; --ink: #1a1a1a; --muted: #666; --bg: #fff; --line: #e5e7eb; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font: 16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color: var(--ink); background: var(--bg); padding: 1rem; }
+  #widget { max-width: 720px; margin: 0 auto; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-bottom: 1rem; }
+  @media (max-width: 560px) { .cards { grid-template-columns: 1fr; } }
+  .card { border: 1px solid var(--line); border-radius: 8px; padding: 1rem; }
+  .card .label { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; margin-bottom: .25rem; }
+  .card .name { font-weight: 600; font-size: 1rem; }
+  .card .price { font-size: 2rem; font-weight: 700; line-height: 1.1; margin: .25rem 0; }
+  .card .delta { font-size: .85rem; color: var(--muted); }
+  .card.center .price { color: var(--bdn-red); }
+  .trend { font-size: .85rem; color: var(--muted); margin-top: .25rem; }
+  #map { width: 100%; height: 360px; }
+  #map svg { width: 100%; height: 100%; }
+  .county { fill: #ddd; stroke: #fff; stroke-width: 1; cursor: pointer; }
+  .county:hover { stroke: #000; stroke-width: 2; }
+  .tooltip { position: absolute; background: #1a1a1a; color: #fff; padding: .35rem .55rem; border-radius: 4px; font-size: .85rem; pointer-events: none; opacity: 0; transition: opacity .1s; z-index: 10; }
+  footer { font-size: .8rem; color: var(--muted); margin-top: .75rem; }
+  .stale { background: #fff7d6; border: 1px solid #f0c14b; padding: .5rem .75rem; border-radius: 6px; margin-bottom: 1rem; font-size: .9rem; }
+</style>
+</head>
+<body>
+<div id="widget">
+  <div id="loading">Loading…</div>
+  <div id="content" hidden>
+    <div id="stale" class="stale" hidden></div>
+    <div class="cards">
+      <div class="card cheapest"><div class="label">Cheapest county</div><div class="name" id="cheap-name">—</div><div class="price" id="cheap-price">—</div><div class="delta" id="cheap-delta">—</div></div>
+      <div class="card center"><div class="label">Maine average</div><div class="price" id="state-price">—</div><div class="delta" id="state-vs-us">—</div><div class="trend" id="state-trend">—</div></div>
+      <div class="card expensive"><div class="label">Most expensive county</div><div class="name" id="exp-name">—</div><div class="price" id="exp-price">—</div><div class="delta" id="exp-delta">—</div></div>
+    </div>
+    <div id="map"></div>
+    <footer id="footer">—</footer>
+  </div>
+  <div id="error" hidden>Couldn't load price data. Check back soon.</div>
+</div>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const DATA_URL  = "data/prices.json";
+const GEO_URL   = "data/maine-counties.geo.json";
+const STALE_HRS = 72;
+
+async function load() {
+  try {
+    const [prices, geo] = await Promise.all([
+      fetch(DATA_URL).then(r => { if (!r.ok) throw new Error("prices"); return r.json(); }),
+      fetch(GEO_URL).then(r => { if (!r.ok) throw new Error("geo"); return r.json(); }),
+    ]);
+    document.getElementById("loading").hidden = true;
+    document.getElementById("content").hidden = false;
+    render(prices, geo);
+  } catch (e) {
+    document.getElementById("loading").hidden = true;
+    document.getElementById("error").hidden = false;
+    console.error(e);
+  }
+}
+
+function fmt(p) { return "$" + p.toFixed(2); }
+
+function delta(a, b) {
+  const c = Math.round((a - b) * 100);
+  if (c === 0) return "Same as state avg";
+  const arrow = c > 0 ? "↑" : "↓";
+  const dir = c > 0 ? "above" : "below";
+  return `${arrow} ${Math.abs(c)}¢ ${dir} state avg`;
+}
+
+function trendLine(state) {
+  const t = state.trend;
+  const base = state.avg_regular;
+  const fmtDir = (label, prev) => {
+    const c = Math.round((base - prev) * 100);
+    if (c === 0) return `Even with ${label}`;
+    return `${c > 0 ? "Up" : "Down"} ${Math.abs(c)}¢ from ${label}`;
+  };
+  return [fmtDir("last week", t.week_ago), fmtDir("a year ago", t.year_ago)].join(" · ");
+}
+
+function render(p, geo) {
+  // Cheapest
+  document.getElementById("cheap-name").textContent  = p.cheapest.name + " County";
+  document.getElementById("cheap-price").textContent = fmt(p.cheapest.avg_regular);
+  document.getElementById("cheap-delta").textContent = delta(p.cheapest.avg_regular, p.state.avg_regular);
+
+  // Most expensive
+  document.getElementById("exp-name").textContent  = p.most_expensive.name + " County";
+  document.getElementById("exp-price").textContent = fmt(p.most_expensive.avg_regular);
+  document.getElementById("exp-delta").textContent = delta(p.most_expensive.avg_regular, p.state.avg_regular);
+
+  // Maine vs national + trend
+  document.getElementById("state-price").textContent = fmt(p.state.avg_regular);
+  const usDiff = Math.round((p.state.avg_regular - p.national.avg_regular) * 100);
+  document.getElementById("state-vs-us").textContent =
+    usDiff === 0
+      ? `Same as US avg ${fmt(p.national.avg_regular)}`
+      : `${Math.abs(usDiff)}¢ ${usDiff > 0 ? "above" : "below"} US avg ${fmt(p.national.avg_regular)}`;
+  document.getElementById("state-trend").textContent = trendLine(p.state);
+
+  // Stale-data warning
+  const updated = new Date(p.updated);
+  const ageHrs = (Date.now() - updated.getTime()) / 36e5;
+  if (ageHrs > STALE_HRS) {
+    const el = document.getElementById("stale");
+    el.hidden = false;
+    el.textContent = `Prices last updated ${updated.toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}.`;
+  }
+
+  // Footer
+  document.getElementById("footer").textContent =
+    `Source: AAA Maine · Updated ${updated.toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})} · Prices for regular gasoline.`;
+
+  // Map
+  renderMap(p, geo);
+}
+
+function renderMap(p, geo) {
+  const priceBy = Object.fromEntries(p.counties.map(c => [c.fips, c.avg_regular]));
+  const prices = p.counties.map(c => c.avg_regular);
+  const min = Math.min(...prices), max = Math.max(...prices);
+  const colorAt = v => {
+    const t = (v - min) / (max - min || 1);
+    // Green (low) -> red (high)
+    const r = Math.round(60 + t * 195);
+    const g = Math.round(160 - t * 110);
+    const b = 60;
+    return `rgb(${r},${g},${b})`;
+  };
+
+  // Bounding box over all coordinates (works for Polygon and MultiPolygon)
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  const eachCoord = (coords, fn) => {
+    if (typeof coords[0] === "number") fn(coords);
+    else coords.forEach(c => eachCoord(c, fn));
+  };
+  geo.features.forEach(f => eachCoord(f.geometry.coordinates, ([x, y]) => {
+    if (x < minX) minX = x; if (y < minY) minY = y;
+    if (x > maxX) maxX = x; if (y > maxY) maxY = y;
+  }));
+
+  const W = 600, H = 360, pad = 10;
+  const sx = (W - 2 * pad) / (maxX - minX);
+  const sy = (H - 2 * pad) / (maxY - minY);
+  const s = Math.min(sx, sy);
+  // Center horizontally if aspect ratio leaves room
+  const offX = (W - (maxX - minX) * s) / 2;
+  const offY = (H - (maxY - minY) * s) / 2;
+  const project = ([x, y]) => [offX + (x - minX) * s, H - offY - (y - minY) * s];
+
+  const ringPath = ring => "M" + ring.map(project).map(pt => pt.join(",")).join("L") + "Z";
+  const featurePath = f => {
+    const c = f.geometry.coordinates;
+    if (f.geometry.type === "Polygon") return c.map(ringPath).join(" ");
+    if (f.geometry.type === "MultiPolygon") return c.map(poly => poly.map(ringPath).join(" ")).join(" ");
+    return "";
+  };
+
+  const svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Map of Maine showing average regular gas prices by county">
+    ${geo.features.map(f => {
+      const fips = f.properties.fips;
+      const name = f.properties.name;
+      const price = priceBy[fips];
+      const fill = price != null ? colorAt(price) : "#ddd";
+      const priceLabel = price != null ? fmt(price) : "—";
+      return `<path class="county" d="${featurePath(f)}" style="fill:${fill}" data-name="${name}" data-price="${priceLabel}"></path>`;
+    }).join("")}
+  </svg>`;
+  document.getElementById("map").innerHTML = svg;
+
+  const tip = document.getElementById("tooltip");
+  document.querySelectorAll(".county").forEach(el => {
+    const show = e => {
+      const x = (e.touches ? e.touches[0].pageX : e.pageX) + 12;
+      const y = (e.touches ? e.touches[0].pageY : e.pageY) + 12;
+      tip.style.opacity = "1";
+      tip.style.left = x + "px";
+      tip.style.top  = y + "px";
+      tip.textContent = `${el.dataset.name} County: ${el.dataset.price}`;
+    };
+    el.addEventListener("mousemove", show);
+    el.addEventListener("touchstart", show);
+    el.addEventListener("mouseleave", () => { tip.style.opacity = "0"; });
+  });
+}
+load();
+</script>
+</body>
+</html>
