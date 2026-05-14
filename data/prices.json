@@ -1,16 +1,16 @@
 {
-  "updated": "2026-05-13T17:18:36Z",
+  "updated": "2026-05-14T11:40:12Z",
   "state": {
     "name": "Maine",
-    "avg_regular": 4.515,
+    "avg_regular": 4.529,
     "trend": {
-      "week_ago": 4.527,
-      "month_ago": 4.043,
-      "year_ago": 2.983
+      "week_ago": 4.539,
+      "month_ago": 4.033,
+      "year_ago": 2.988
     }
   },
   "national": {
-    "avg_regular": 4.511
+    "avg_regular": 4.534
   },
   "counties": [
     {
