@@ -1,105 +1,105 @@
 {
-  "updated": "2026-08-27T20:56:28Z",
+  "updated": "2026-08-28T21:19:41Z",
   "state": {
     "name": "Maine",
-    "avg_regular": 4.12,
+    "avg_regular": 4.113,
     "trend": {
-      "week_ago": 4.061,
-      "month_ago": 4.103,
-      "year_ago": 3.144
+      "week_ago": 4.099,
+      "month_ago": 4.13,
+      "year_ago": 3.141
     }
   },
   "national": {
-    "avg_regular": 4.099
+    "avg_regular": 4.089
   },
   "counties": [
     {
       "name": "Androscoggin",
       "fips": "23001",
-      "avg_regular": 4.12
+      "avg_regular": 4.113
     },
     {
       "name": "Aroostook",
       "fips": "23003",
-      "avg_regular": 4.164
+      "avg_regular": 4.155
     },
     {
       "name": "Cumberland",
       "fips": "23005",
-      "avg_regular": 4.082
+      "avg_regular": 4.073
     },
     {
       "name": "Franklin",
       "fips": "23007",
-      "avg_regular": 4.106
+      "avg_regular": 4.103
     },
     {
       "name": "Hancock",
       "fips": "23009",
-      "avg_regular": 4.218
+      "avg_regular": 4.208
     },
     {
       "name": "Kennebec",
       "fips": "23011",
-      "avg_regular": 4.106
+      "avg_regular": 4.103
     },
     {
       "name": "Knox",
       "fips": "23013",
-      "avg_regular": 4.072
+      "avg_regular": 4.07
     },
     {
       "name": "Lincoln",
       "fips": "23015",
-      "avg_regular": 4.102
+      "avg_regular": 4.088
     },
     {
       "name": "Oxford",
       "fips": "23017",
-      "avg_regular": 4.094
+      "avg_regular": 4.078
     },
     {
       "name": "Penobscot",
       "fips": "23019",
-      "avg_regular": 4.121
+      "avg_regular": 4.119
     },
     {
       "name": "Piscataquis",
       "fips": "23021",
-      "avg_regular": 4.159
+      "avg_regular": 4.167
     },
     {
       "name": "Sagadahoc",
       "fips": "23023",
-      "avg_regular": 4.122
+      "avg_regular": 4.116
     },
     {
       "name": "Somerset",
       "fips": "23025",
-      "avg_regular": 4.102
+      "avg_regular": 4.09
     },
     {
       "name": "Waldo",
       "fips": "23027",
-      "avg_regular": 4.111
+      "avg_regular": 4.097
     },
     {
       "name": "Washington",
       "fips": "23029",
-      "avg_regular": 4.234
+      "avg_regular": 4.236
     },
     {
       "name": "York",
       "fips": "23031",
-      "avg_regular": 4.116
+      "avg_regular": 4.11
     }
   ],
   "cheapest": {
     "name": "Knox",
-    "avg_regular": 4.072
+    "avg_regular": 4.07
   },
   "most_expensive": {
     "name": "Washington",
-    "avg_regular": 4.234
+    "avg_regular": 4.236
   }
 }
