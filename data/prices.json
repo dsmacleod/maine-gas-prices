@@ -1,47 +1,47 @@
 {
-  "updated": "2026-09-22T15:27:25Z",
+  "updated": "2026-09-23T15:22:04Z",
   "state": {
     "name": "Maine",
-    "avg_regular": 4.421,
+    "avg_regular": 4.422,
     "trend": {
-      "week_ago": 4.32,
-      "month_ago": 4.104,
-      "year_ago": 3.123
+      "week_ago": 4.322,
+      "month_ago": 4.105,
+      "year_ago": 3.119
     }
   },
   "national": {
-    "avg_regular": 4.475
+    "avg_regular": 4.474
   },
   "counties": [
     {
       "name": "Androscoggin",
       "fips": "23001",
-      "avg_regular": 4.466
+      "avg_regular": 4.468
     },
     {
       "name": "Aroostook",
       "fips": "23003",
-      "avg_regular": 4.468
+      "avg_regular": 4.465
     },
     {
       "name": "Cumberland",
       "fips": "23005",
-      "avg_regular": 4.386
+      "avg_regular": 4.385
     },
     {
       "name": "Franklin",
       "fips": "23007",
-      "avg_regular": 4.429
+      "avg_regular": 4.423
     },
     {
       "name": "Hancock",
       "fips": "23009",
-      "avg_regular": 4.491
+      "avg_regular": 4.498
     },
     {
       "name": "Kennebec",
       "fips": "23011",
-      "avg_regular": 4.419
+      "avg_regular": 4.412
     },
     {
       "name": "Knox",
@@ -56,12 +56,12 @@
     {
       "name": "Oxford",
       "fips": "23017",
-      "avg_regular": 4.436
+      "avg_regular": 4.434
     },
     {
       "name": "Penobscot",
       "fips": "23019",
-      "avg_regular": 4.424
+      "avg_regular": 4.435
     },
     {
       "name": "Piscataquis",
@@ -71,17 +71,17 @@
     {
       "name": "Sagadahoc",
       "fips": "23023",
-      "avg_regular": 4.429
+      "avg_regular": 4.424
     },
     {
       "name": "Somerset",
       "fips": "23025",
-      "avg_regular": 4.358
+      "avg_regular": 4.354
     },
     {
       "name": "Waldo",
       "fips": "23027",
-      "avg_regular": 4.427
+      "avg_regular": 4.442
     },
     {
       "name": "Washington",
